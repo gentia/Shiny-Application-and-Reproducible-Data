@@ -1,0 +1,71 @@
+Shiny Application Presentation
+========================================================
+author: Anais G.
+date: August 31, 2018
+autosize: true
+
+ui.R
+========================================================
+class: small-code
+```{r, eval=FALSE}
+library(shiny)
+library(ggplot2)
+Data <- LifeCycleSavings
+shinyUI(fluidPage(
+  titlePanel("Variables for Life Savings"),
+  sidebarLayout(
+    sidebarPanel(
+      h1("Variables"),
+      sliderInput(
+        "obs", 
+        "Observations",
+        min = 5,
+        max = nrow(Data),
+        value = min(5, nrow(Data)),
+        step = 5 
+        ),
+      selectInput("x","X",names(Data)),
+      selectInput("y", "Y", names(Data)),
+      selectInput("color","Color",c("None",names(Data)))
+      ),
+    mainPanel(
+      plotOutput("plot"))
+    )
+  )
+)
+       
+```
+
+server.R
+========================================================
+class: small-code
+```{r, eval=FALSE}
+library(shiny)
+library(ggplot2)
+shinyServer(function(input, output) {
+  Data <- reactive({ 
+    LifeCycleSavings[sample(
+      nrow(LifeCycleSavings),input$obs),]})
+  output$plot <- reactivePlot(function(){
+    a <- ggplot(Data(), aes_string(x=input$x, y=input$y)) + geom_point()
+    if (input$color != "None")
+      a <- a + aes_string(color = input$color)
+    print(a)
+  }, height = 500)
+})
+```
+
+Overview of the Data
+=========================================================
+The data being used, LifeCyleSavings is the Intercountry Life-Cycle Savings data from 1960-1970. It has 50 observation with 5 variables: <br /> <small>**sr:** aggregate personal savings <br /> 
+**pop15:** Percent of population under 15 years old <br /> 
+**pop75:** Percent of population over 75 years old <br />
+**dpi:** Real per-capita disposable income <br />
+**ddpi:** Percent growth rae of dpi </small> <br />
+The application created gives the ability to find a connection or correlation between the 5 variablesn within this dataset. 
+
+Application
+========================================================
+Below is a link the the application itself:
+
+http://127.0.0.1:7818/
